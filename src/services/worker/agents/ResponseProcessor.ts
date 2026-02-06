@@ -16,6 +16,8 @@ import { parseObservations, parseSummary, type ParsedObservation, type ParsedSum
 import { updateCursorContextForProject } from '../../integrations/CursorHooksInstaller.js';
 import { updateFolderClaudeMdFiles } from '../../../utils/claude-md-utils.js';
 import { getWorkerPort } from '../../../shared/worker-utils.js';
+import { SettingsDefaultsManager } from '../../../shared/SettingsDefaultsManager.js';
+import { USER_SETTINGS_PATH } from '../../../shared/paths.js';
 import type { ActiveSession } from '../../worker-types.js';
 import type { DatabaseManager } from '../DatabaseManager.js';
 import type { SessionManager } from '../SessionManager.js';
@@ -221,7 +223,8 @@ async function syncAndBroadcastObservations(
     allFilePaths.push(...(obs.files_read || []));
   }
 
-  if (allFilePaths.length > 0) {
+  const settings = SettingsDefaultsManager.loadFromFile(USER_SETTINGS_PATH);
+  if (allFilePaths.length > 0 && settings.CLAUDE_MEM_FOLDER_CLAUDEMD_ENABLED === 'true') {
     updateFolderClaudeMdFiles(
       allFilePaths,
       session.project,
