@@ -122,10 +122,10 @@ export class SessionRoutes extends BaseRouteHandler {
   ): void {
     if (!session) return;
 
-    // Fix stale AbortController death loop (Issue #817):
-    // When a generator exits normally (e.g., idle timeout), it aborts the controller
-    // but the session stays in memory. If we start a new generator with the stale
-    // aborted signal, query() exits immediately → .finally() sees wasAborted → repeat.
+    /* Fix stale AbortController death loop (Issue #817):
+      When a generator exits normally (e.g., idle timeout), it aborts the controller
+      but the session stays in memory. If we start a new generator with the stale
+      aborted signal, query() exits immediately → .finally() sees wasAborted → repeat. */
     if (session.abortController.signal.aborted) {
       logger.info('SESSION', 'Replacing stale aborted AbortController before starting generator', {
         sessionId: session.sessionDbId,
@@ -150,7 +150,7 @@ export class SessionRoutes extends BaseRouteHandler {
       .catch(error => {
         // Only log non-abort errors
         if (session.abortController.signal.aborted) return;
-        
+
         logger.error('SESSION', `Generator failed`, {
           sessionId: session.sessionDbId,
           provider: provider,
